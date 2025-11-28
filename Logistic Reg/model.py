@@ -3,6 +3,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 import numpy as np
 import warnings
+import joblib
 
 warnings.filterwarnings('ignore', category=UserWarning)
 
@@ -137,3 +138,13 @@ submission_df.to_csv(submission_filename, index=False)
 
 print(f"\nSubmission file created successfully: {submission_filename}")
 print(submission_df.head())
+
+joblib.dump(model, "logistic_model.joblib")
+
+# Save scaler
+joblib.dump(scaler, "scaler.joblib")
+
+# Save exact feature order
+joblib.dump(list(X_train_processed.columns), "columns.joblib")
+
+print("\nSaved: logistic_model.joblib, scaler.joblib, columns.joblib")
