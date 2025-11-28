@@ -1,9 +1,11 @@
 import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
 from sklearn.model_selection import RandomizedSearchCV
 from scipy.stats import loguniform
-import numpy as np
 import warnings
 import time
 
@@ -24,13 +26,50 @@ except FileNotFoundError:
 df_train.dropna(subset=['spend_category'], inplace=True)
 df_train['spend_category'] = df_train['spend_category'].astype(int)
 
-# Store trip_id for test set submission
 test_trip_ids = df_test['trip_id']
 
-# Separate features (X) and target (y)
 X_train = df_train.drop(['trip_id', 'spend_category'], axis=1)
 y_train = df_train['spend_category']
 X_test = df_test.drop('trip_id', axis=1)
+
+
+print("\n--- EDA START ---")
+
+# 1. Overview of dataset
+print("\nShape of Train:", df_train.shape)
+print("Shape of Test:", df_test.shape)
+
+print("\nTrain Data Types:")
+print(df_train.dtypes)
+
+# 2. Check target variable distribution
+print("\nTarget Distribution:")
+print(y_train.value_counts(normalize=True))
+sns.countplot(x=y_train)
+plt.title("Target Class Distribution")
+plt.show()
+
+# 3. Numerical Summary
+print("\nNumerical Feature Summary:")
+print(X_train.describe())
+
+# 4. Missing Value Check
+print("\nMissing Values (%):")
+print((df_train.isna().mean() * 100).sort_values(ascending=False))
+
+# 5. Correlation (only top correlated with target)
+corr = df_train.corr(numeric_only=True)
+target_corr = corr['spend_category'].sort_values(ascending=False)
+print("\nTop Features Correlated with Target:")
+print(target_corr.head(10))
+
+plt.figure(figsize=(8,5))
+sns.heatmap(corr, annot=False, cmap='coolwarm')
+plt.title("Correlation Heatmap")
+plt.show()
+
+print("\n--- EDA COMPLETE ---\n")
+
 
 # --- 2. Feature Mapping and Imputation (FIXED) ---
 print("Handling missing values and applying Ordinal Encoding...")
